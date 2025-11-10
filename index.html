@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 Beam's Media Archive — Mobile</title>
+    <meta name="theme-color" content="#b30000">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card: #1a1a1a;
+            --text: #e6e6e6;
+            --muted: rgba(230,230,230,0.65);
+            --accent: #b30000;
+            --accent-hover: #990000;
+            --green: #10b981;
+            --red: #b91c1c;
+            --card-border: rgba(255,255,255,0.08);
+            --card-shadow: 0 10px 25px rgba(0,0,0,0.28);
+            --radius: 14px;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.5;
+            overflow-x: hidden;
+            padding-bottom: 20px;
+        }
+        
+        header {
+            background: var(--card);
+            padding: 16px;
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .container {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+            padding: 16px;
+        }
+        
+        .card h3 {
+            margin: 0 0 12px 0;
+            font-size: 18px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background 0.25s;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 8px;
+        }
+        
+        .btn:hover, .btn:active {
+            background: var(--accent-hover);
+        }
+        
+        .btn-green {
+            background: var(--green);
+        }
+        
+        .btn-green:hover, .btn-green:active {
+            background: #0da271;
+        }
+        
+        .input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            background: transparent;
+            color: var(--text);
+            font-size: 16px;
+        }
+        
+        .small {
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+        
+        .folders-empty {
+            color: var(--muted);
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .folder-section {
+            border: 1px dashed var(--card-border);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.02);
+            margin-top: 12px;
+        }
+        
+        .folder-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 12px;
+        }
+        
+        .folder-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            flex: 1;
+        }
+        
+        .folder-title {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .folder-actions {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .folder-menu-btn {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: inherit;
+            border-radius: 8px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .folder-menu-btn:hover, .folder-menu-btn:active {
+            background: rgba(255,255,255,0.06);
+        }
+        
+        .toggle-icon {
+            display: inline-block;
+            width: 16px;
+            text-align: center;
+            opacity: 0.85;
+        }
+        
+        .folder-menu {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .folder-menu-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            z-index: 99;
+            min-width: 140px;
+            margin-top: 4px;
+        }
+        
+        .folder-menu-content button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border: none;
+            color: inherit;
+            padding: 10px 12px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .folder-menu-content button:hover, .folder-menu-content button:active {
+            background: var(--accent-hover);
+            color: #fff;
+        }
+        
+        .folder-menu.show .folder-menu-content {
+            display: block;
+        }
+        
+        .main {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+            padding: 16px;
+        }
+        
+        .topbar {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .ghost {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #fff;
+            transition: background 0.25s;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        .ghost:hover, .ghost:active {
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40vh;
+            color: var(--muted);
+            font-size: 16px;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .media-topbar-actions, .folder-topbar-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .folder-topbar-actions button, .media-topbar-actions button {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .folder-topbar-actions button {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: var(--text);
+        }
+        
+        .folder-topbar-actions button:hover, .folder-topbar-actions button:active {
+            background: rgba(255,255,255,0.08);
+        }
+        
+        .media-topbar-actions button {
+            background: var(--accent);
+            border: none;
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        .media-topbar-actions button:hover, .media-topbar-actions button:active {
+            background: var(--accent-hover);
+        }
+        
+        .media-topbar-actions .btn-green {
+            background: var(--green);
+        }
+        
+        .media-topbar-actions .btn-green:hover, .media-topbar-actions .btn-green:active {
+            background: #0da271;
+        }
+        
+        .thumb {
+            width: 100%;
+            height: 180px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+        }
+        
+        .thumb img, .thumb video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .vitem {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 16px;
+        }
+        
+        .vitem:hover, .vitem:active {
+            background: rgba(255,255,255,0.06);
+        }
+        
+        .badge {
+            font-size: 12px;
+            background: var(--accent);
+            color: #fff;
+            border-radius: 999px;
+            padding: 4px 10px;
+            margin-left: 8px;
+        }
+        
+        .item-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .item-btn {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            color: inherit;
+            border-radius: 8px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .item-btn:hover, .item-btn:active {
+            background: rgba(255,255,255,0.06);
+        }
+        
+        .vitem h4 {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin: 8px 0 0 0;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 12px;
+        }
+        
+        .pagination button {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .pagination button:hover:not(:disabled), .pagination button:active:not(:disabled) {
+            background: var(--accent-hover);
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-info {
+            font-size: 16px;
+            color: var(--muted);
+        }
+        
+        .viewer {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+        
+        .viewer.show {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .viewer-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+            position: relative;
+        }
+        
+        .viewer-topbar {
+            width: 100%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.75);
+            color: #fff;
+            backdrop-filter: blur(12px);
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+        }
+        
+        #viewerVideo, #viewerImage {
+            display: block;
+            margin: 0 auto;
+            max-width: 96vw;
+            max-height: 70vh;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.45);
+            background: #000;
+        }
+        
+        #viewerImage {
+            display: none;
+            object-fit: contain;
+        }
+        
+        .viewer-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.7);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 10000;
+            transition: background 0.2s;
+        }
+        
+        .viewer-nav:hover, .viewer-nav:active {
+            background: rgba(0,0,0,0.9);
+        }
+        
+        #viewerPrev {
+            left: 16px;
+        }
+        
+        #viewerNext {
+            right: 16px;
+        }
+        
+        .toast {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            background: rgba(26,26,26,0.95);
+            color: #e6e6e6;
+            padding: 12px 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+            pointer-events: none;
+            z-index: 10000;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .breadcrumb {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .folder-count {
+            font-size: 12px;
+            color: var(--muted);
+            margin-left: 8px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⚡ Beam's Media Archive</h1>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h3>📦 Create Folder</h3>
+            <input id="newFolderName" class="input" placeholder="New folder name">
+            <button id="addFolder" class="btn">🦈 Add Folder</button>
+        </div>
+
+        <div class="card">
+            <h3>🏠 Main Library</h3>
+            <div class="small breadcrumb">Viewing: <span id="viewLabel">Main Library</span></div>
+            <div id="foldersEmpty" class="folders-empty">No folders yet. Create one below!</div>
+            <div id="foldersContainer"></div>
+        </div>
+
+        <div class="main">
+            <div class="topbar">
+                <button id="backBtn" class="ghost hidden">⬅️ Back</button>
+                <button id="backToMain" class="ghost hidden">🏠 Back to Main</button>
+                <div class="media-topbar-actions" id="mediaTopbarActions">
+                    <button id="addVideosTopbar">🎥 Add Videos</button>
+                    <button id="addPhotosTopbar" class="btn-green">📷 Add Photos</button>
+                </div>
+                <div class="folder-topbar-actions hidden" id="folderTopbarActions">
+                    <button id="folderRemove">🗑️ Remove</button>
+                    <button id="folderRename">✏️ Rename</button>
+                    <button id="folderSubfolder">🦈 Subfolder</button>
+                </div>
+            </div>
+            <div id="mainEmpty" class="empty">No media yet. Add some videos or photos to get started!</div>
+            <div id="mainList" class="hidden"></div>
+            <div id="pagination" class="pagination hidden"></div>
+        </div>
+
+        <div class="card">
+            <h3>📤 Import / Export Files</h3>
+            <button id="exportLibrary" class="btn">⬇️ Export Library (.zip)</button>
+            <input id="importFolderInput" type="file" webkitdirectory directory multiple class="hidden">
+            <button id="importLibrary" class="btn btn-green">📦 Import Library (unzipped folder)</button>
+            <div class="small">
+                Export creates a .zip backup. To import, first unzip it locally, then select the folder.
+            </div>
+        </div>
+    </div>
+
+    <!-- Viewer -->
+    <div id="viewer" class="viewer" aria-hidden="true">
+        <div class="viewer-inner">
+            <div class="viewer-topbar">
+                <span id="viewerFilename" class="title">🎞️ </span>
+                <button id="viewerClose" class="ghost">❌ Close</button>
+            </div>
+            <button id="viewerPrev" class="viewer-nav">⏮</button>
+            <video id="viewerVideo" playsinline controls preload="metadata"></video>
+            <img id="viewerImage" alt="Image preview" />
+            <button id="viewerNext" class="viewer-nav">⏭</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- Hidden file inputs -->
+    <input id="videoInput" type="file" accept="video/*" multiple class="hidden">
+    <input id="photoInput" type="file" accept="image/*" multiple class="hidden">
+
+    <script>
+        // Simple state management
+        const state = {
+            folders: [],
+            media: {},
+            collapse: {},
+            activeFolderId: '',
+            viewerCurrent: null,
+            folderHistory: []
+        };
+
+        // DOM references
+        const foldersContainer = document.getElementById('foldersContainer');
+        const foldersEmpty = document.getElementById('foldersEmpty');
+        const newFolderName = document.getElementById('newFolderName');
+        const addFolderBtn = document.getElementById('addFolder');
+        const videoInput = document.getElementById('videoInput');
+        const addVideosTopbar = document.getElementById('addVideosTopbar');
+        const photoInput = document.getElementById('photoInput');
+        const addPhotosTopbar = document.getElementById('addPhotosTopbar');
+        const mainEmpty = document.getElementById('mainEmpty');
+        const mainList = document.getElementById('mainList');
+        const backBtn = document.getElementById('backBtn');
+        const backToMain = document.getElementById('backToMain');
+        const viewLabel = document.getElementById('viewLabel');
+        const paginationEl = document.getElementById('pagination');
+        const folderTopbarActions = document.getElementById('folderTopbarActions');
+        const folderRemoveBtn = document.getElementById('folderRemove');
+        const folderRenameBtn = document.getElementById('folderRename');
+        const folderSubfolderBtn = document.getElementById('folderSubfolder');
+        const mediaTopbarActions = document.getElementById('mediaTopbarActions');
+        const viewer = document.getElementById('viewer');
+        const viewerVideo = document.getElementById('viewerVideo');
+        const viewerImage = document.getElementById('viewerImage');
+        const viewerFilename = document.getElementById('viewerFilename');
+        const viewerClose = document.getElementById('viewerClose');
+        const viewerPrev = document.getElementById('viewerPrev');
+        const viewerNext = document.getElementById('viewerNext');
+        const toast = document.getElementById('toast');
+        const exportBtn = document.getElementById('exportLibrary');
+        const importBtn = document.getElementById('importLibrary');
+        const importFolderInput = document.getElementById('importFolderInput');
+
+        // Utility functions
+        function showToast(msg, ms = 2600) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), ms);
+        }
+
+        function toggleElement(element, show) {
+            if (show) {
+                element.classList.remove('hidden');
+            } else {
+                element.classList.add('hidden');
+            }
+        }
+
+        // Generate unique ID
+        function uid(prefix) {
+            return prefix + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+        }
+
+        // Folder functions
+        function renderFolders() {
+            foldersContainer.innerHTML = '';
+            toggleElement(foldersEmpty, state.folders.length === 0);
+            
+            state.folders.forEach(folder => {
+                if (!folder.parentId) {
+                    appendFolderHeader(folder, foldersContainer);
+                }
+            });
+        }
+
+        function appendFolderHeader(folder, host) {
+            const section = document.createElement('div');
+            section.className = 'folder-section';
+            
+            const header = document.createElement('div');
+            header.className = 'folder-header';
+            header.dataset.id = folder.id;
+            
+            const left = document.createElement('div');
+            left.className = 'folder-left';
+            
+            const toggle = document.createElement('span');
+            toggle.className = 'toggle-icon';
+            toggle.textContent = state.collapse[folder.id] ? '▶' : '▼';
+            toggle.onclick = (e) => {
+                e.stopPropagation();
+                state.collapse[folder.id] = !state.collapse[folder.id];
+                renderFolders();
+            };
+            
+            const title = document.createElement('span');
+            title.className = 'folder-title';
+            title.textContent = '🦈 ' + folder.name;
+            
+            const count = document.createElement('span');
+            count.className = 'folder-count';
+            count.textContent = `(${getFolderItemCount(folder.id)} items)`;
+            
+            left.append(toggle, title, count);
+            
+            const actions = document.createElement('div');
+            actions.className = 'folder-actions';
+            
+            const menu = document.createElement('div');
+            menu.className = 'folder-menu';
+            
+            const menuBtn = document.createElement('button');
+            menuBtn.className = 'folder-menu-btn';
+            menuBtn.textContent = '⋮';
+            menuBtn.onclick = (e) => {
+                e.stopPropagation();
+                menu.classList.toggle('show');
+            };
+            
+            const menuBox = document.createElement('div');
+            menuBox.className = 'folder-menu-content';
+            
+            const addSub = document.createElement('button');
+            addSub.textContent = '➕ Subfolder';
+            addSub.onclick = (e) => {
+                e.stopPropagation();
+                menu.classList.remove('show');
+                const name = prompt('Subfolder name?');
+                if (name && name.trim()) {
+                    state.folders.push({
+                        id: uid('fld'),
+                        name: name.trim(),
+                        parentId: folder.id
+                    });
+                    renderFolders();
+                }
+            };
+            
+            const ren = document.createElement('button');
+            ren.textContent = '✏️ Rename';
+            ren.onclick = (e) => {
+                e.stopPropagation();
+                menu.classList.remove('show');
+                const name = prompt('Rename folder:', folder.name);
+                if (name && name.trim()) {
+                    folder.name = name.trim();
+                    renderFolders();
+                    if (state.activeFolderId === folder.id) {
+                        viewLabel.textContent = folder.name;
+                    }
+                }
+            };
+            
+            const del = document.createElement('button');
+            del.textContent = '🗑️ Delete';
+            del.onclick = (e) => {
+                e.stopPropagation();
+                menu.classList.remove('show');
+                if (confirm('Delete this folder and ALL of its contents?')) {
+                    deleteFolder(folder.id);
+                    if (state.activeFolderId === folder.id) {
+                        state.activeFolderId = '';
+                        toggleElement(backBtn, false);
+                        toggleElement(backToMain, false);
+                        toggleElement(folderTopbarActions, false);
+                        viewLabel.textContent = 'Main Library';
+                    }
+                    renderFolders();
+                    renderMain();
+                }
+            };
+            
+            menuBox.append(addSub, ren, del);
+            menu.append(menuBtn, menuBox);
+            actions.append(menu);
+            header.append(left, actions);
+            
+            header.onclick = () => {
+                if (state.activeFolderId) {
+                    state.folderHistory.push(state.activeFolderId);
+                }
+                
+                state.activeFolderId = folder.id;
+                viewLabel.textContent = folder.name;
+                toggleElement(backBtn, true);
+                toggleElement(backToMain, true);
+                toggleElement(folderTopbarActions, true);
+                renderFolders();
+                renderMain();
+            };
+            
+            section.appendChild(header);
+            
+            // Add subfolders if not collapsed
+            if (!state.collapse[folder.id]) {
+                const subfolders = state.folders.filter(f => f.parentId === folder.id);
+                if (subfolders.length > 0) {
+                    const nest = document.createElement('div');
+                    nest.style.marginLeft = '16px';
+                    subfolders.forEach(sub => appendFolderHeader(sub, nest));
+                    section.appendChild(nest);
+                }
+            }
+            
+            host.appendChild(section);
+        }
+
+        function getFolderItemCount(folderId) {
+            const mediaCount = Object.values(state.media).filter(m => m.folderId === folderId).length;
+            const folderCount = state.folders.filter(f => f.parentId === folderId).length;
+            return mediaCount + folderCount;
+        }
+
+        function deleteFolder(id) {
+            // Remove subfolders
+            state.folders = state.folders.filter(f => f.parentId !== id);
+            // Remove the folder itself
+            state.folders = state.folders.filter(f => f.id !== id);
+            // Remove media in the folder
+            Object.keys(state.media).forEach(key => {
+                if (state.media[key].folderId === id) {
+                    delete state.media[key];
+                }
+            });
+        }
+
+        // Media functions
+        function renderMain() {
+            mainList.innerHTML = '';
+            
+            const inFolder = !!state.activeFolderId;
+            const currentFolders = state.folders.filter(f => 
+                inFolder ? f.parentId === state.activeFolderId : !f.parentId
+            );
+            
+            const filteredMedia = Object.values(state.media).filter(m => 
+                inFolder ? m.folderId === state.activeFolderId : !m.folderId
+            );
+            
+            const allItems = [
+                ...currentFolders.map(f => ({...f, type: 'folder'})),
+                ...filteredMedia
+            ];
+            
+            toggleElement(mainEmpty, allItems.length === 0);
+            toggleElement(mainList, allItems.length > 0);
+            toggleElement(paginationEl, allItems.length > 0);
+            
+            if (allItems.length === 0) return;
+            
+            allItems.forEach(item => {
+                if (item.type === 'folder') {
+                    mainList.appendChild(renderFolderItem(item));
+                } else {
+                    mainList.appendChild(renderMediaItem(item));
+                }
+            });
+        }
+
+        function renderFolderItem(folder) {
+            const el = document.createElement('div');
+            el.className = 'vitem';
+            
+            const th = document.createElement('div');
+            th.className = 'thumb';
+            th.style.fontSize = '48px';
+            th.textContent = '🦈';
+            
+            const meta = document.createElement('div');
+            const h = document.createElement('h4');
+            h.textContent = folder.name;
+            const badge = document.createElement('span');
+            badge.className = 'badge';
+            badge.textContent = 'FOLDER';
+            h.appendChild(badge);
+            meta.appendChild(h);
+            
+            const count = document.createElement('div');
+            count.className = 'small';
+            count.textContent = `${getFolderItemCount(folder.id)} items`;
+            meta.appendChild(count);
+            
+            const actions = document.createElement('div');
+            actions.className = 'item-actions';
+            
+            const delBtn = document.createElement('button');
+            delBtn.className = 'item-btn';
+            delBtn.textContent = '🗑️';
+            delBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (confirm('Delete folder "' + folder.name + '" and ALL contents?')) {
+                    deleteFolder(folder.id);
+                    if (state.activeFolderId === folder.id) {
+                        state.activeFolderId = '';
+                        toggleElement(backBtn, false);
+                        toggleElement(backToMain, false);
+                        toggleElement(folderTopbarActions, false);
+                        viewLabel.textContent = 'Main Library';
+                    }
+                    renderFolders();
+                    renderMain();
+                }
+            };
+            
+            actions.append(delBtn);
+            el.append(th, meta, actions);
+            
+            el.onclick = () => {
+                if (state.activeFolderId) {
+                    state.folderHistory.push(state.activeFolderId);
+                }
+                
+                state.activeFolderId = folder.id;
+                viewLabel.textContent = folder.name;
+                toggleElement(backBtn, true);
+                toggleElement(backToMain, true);
+                toggleElement(folderTopbarActions, true);
+                renderFolders();
+                renderMain();
+            };
+            
+            return el;
+        }
+
+        function renderMediaItem(media) {
+            const el = document.createElement('div');
+            el.className = 'vitem';
+            
+            const th = document.createElement('div');
+            th.className = 'thumb';
+            
+            // Create a placeholder for media (in a real app, this would show actual media)
+            const placeholder = document.createElement('div');
+            placeholder.style.width = '100%';
+            placeholder.style.height = '100%';
+            placeholder.style.display = 'flex';
+            placeholder.style.alignItems = 'center';
+            placeholder.style.justifyContent = 'center';
+            placeholder.style.fontSize = '48px';
+            placeholder.textContent = media.type === 'photo' ? '📷' : '🎥';
+            th.appendChild(placeholder);
+            
+            const meta = document.createElement('div');
+            const h = document.createElement('h4');
+            h.textContent = media.name;
+            const badge = document.createElement('span');
+            badge.className = 'badge';
+            badge.textContent = media.type.toUpperCase();
+            h.appendChild(badge);
+            meta.appendChild(h);
+            
+            const actions = document.createElement('div');
+            actions.className = 'item-actions';
+            
+            const renBtn = document.createElement('button');
+            renBtn.className = 'item-btn';
+            renBtn.textContent = '✏️';
+            renBtn.onclick = (e) => {
+                e.stopPropagation();
+                const newName = prompt('Rename file:', media.name);
+                if (newName && newName.trim()) {
+                    media.name = newName.trim();
+                    renderMain();
+                }
+            };
+            
+            const delBtn = document.createElement('button');
+            delBtn.className = 'item-btn';
+            delBtn.textContent = '🗑️';
+            delBtn.onclick = (e) => {
+                e.stopPropagation();
+                if (confirm('Delete "' + media.name + '"?')) {
+                    delete state.media[media.id];
+                    renderMain();
+                }
+            };
+            
+            actions.append(renBtn, delBtn);
+            el.append(th, meta, actions);
+            
+            el.onclick = () => openViewer(media);
+            
+            return el;
+        }
+
+        // Viewer functions
+        function openViewer(media) {
+            viewerFilename.textContent = (media.type === 'photo' ? '📷 ' : '🎞️ ') + media.name;
+            viewer.classList.add('show');
+            viewer.setAttribute('aria-hidden', 'false');
+            
+            if (media.type === 'photo') {
+                toggleElement(viewerImage, true);
+                toggleElement(viewerVideo, false);
+                // In a real app, you would set the actual image source
+                viewerImage.alt = media.name;
+            } else {
+                toggleElement(viewerImage, false);
+                toggleElement(viewerVideo, true);
+                // In a real app, you would set the actual video source
+            }
+        }
+
+        function closeViewer() {
+            viewer.classList.remove('show');
+            viewer.setAttribute('aria-hidden', 'true');
+            toggleElement(viewerImage, false);
+            toggleElement(viewerVideo, false);
+            viewerVideo.pause();
+        }
+
+        // Event listeners
+        addFolderBtn.addEventListener('click', () => {
+            const name = (newFolderName.value || '').trim();
+            if (!name) return;
+            
+            state.folders.push({
+                id: uid('fld'),
+                name: name,
+                parentId: state.activeFolderId || ''
+            });
+            
+            newFolderName.value = '';
+            renderFolders();
+            renderMain();
+            showToast('✅ Folder created');
+        });
+
+        addVideosTopbar.addEventListener('click', () => {
+            videoInput.click();
+        });
+
+        addPhotosTopbar.addEventListener('click', () => {
+            photoInput.click();
+        });
+
+        videoInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files || []);
+            files.forEach(file => {
+                state.media[uid('vid')] = {
+                    id: uid('vid'),
+                    name: file.name,
+                    type: 'video',
+                    folderId: state.activeFolderId || '',
+                    createdAt: Date.now()
+                };
+            });
+            
+            videoInput.value = '';
+            renderMain();
+            showToast(`✅ Added ${files.length} video(s)`);
+        });
+
+        photoInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files || []);
+            files.forEach(file => {
+                state.media[uid('img')] = {
+                    id: uid('img'),
+                    name: file.name,
+                    type: 'photo',
+                    folderId: state.activeFolderId || '',
+                    createdAt: Date.now()
+                };
+            });
+            
+            photoInput.value = '';
+            renderMain();
+            showToast(`✅ Added ${files.length} photo(s)`);
+        });
+
+        backToMain.addEventListener('click', () => {
+            state.activeFolderId = '';
+            state.folderHistory = [];
+            toggleElement(backBtn, false);
+            toggleElement(backToMain, false);
+            toggleElement(folderTopbarActions, false);
+            viewLabel.textContent = 'Main Library';
+            renderFolders();
+            renderMain();
+        });
+
+        backBtn.addEventListener('click', () => {
+            if (state.folderHistory.length > 0) {
+                const previousFolderId = state.folderHistory.pop();
+                state.activeFolderId = previousFolderId;
+                
+                const previousFolder = state.folders.find(f => f.id === previousFolderId);
+                if (previousFolder) {
+                    viewLabel.textContent = previousFolder.name;
+                }
+                
+                if (state.folderHistory.length === 0) {
+                    toggleElement(backBtn, false);
+                }
+            } else {
+                state.activeFolderId = '';
+                toggleElement(backBtn, false);
+                toggleElement(backToMain, false);
+                toggleElement(folderTopbarActions, false);
+                viewLabel.textContent = 'Main Library';
+            }
+            
+            renderFolders();
+            renderMain();
+        });
+
+        folderRemoveBtn.addEventListener('click', () => {
+            if (!state.activeFolderId) return;
+            
+            const folder = state.folders.find(f => f.id === state.activeFolderId);
+            if (!folder) return;
+            
+            if (confirm('Delete folder "' + folder.name + '" and ALL contents?')) {
+                deleteFolder(folder.id);
+                state.activeFolderId = '';
+                toggleElement(backBtn, false);
+                toggleElement(backToMain, false);
+                toggleElement(folderTopbarActions, false);
+                viewLabel.textContent = 'Main Library';
+                renderFolders();
+                renderMain();
+                showToast('✅ Folder deleted');
+            }
+        });
+
+        folderRenameBtn.addEventListener('click', () => {
+            if (!state.activeFolderId) return;
+            
+            const folder = state.folders.find(f => f.id === state.activeFolderId);
+            if (!folder) return;
+            
+            const name = prompt('Rename folder:', folder.name);
+            if (name && name.trim()) {
+                folder.name = name.trim();
+                viewLabel.textContent = folder.name;
+                renderFolders();
+                renderMain();
+                showToast('✅ Folder renamed');
+            }
+        });
+
+        folderSubfolderBtn.addEventListener('click', () => {
+            if (!state.activeFolderId) return;
+            
+            const name = prompt('Subfolder name?');
+            if (name && name.trim()) {
+                state.folders.push({
+                    id: uid('fld'),
+                    name: name.trim(),
+                    parentId: state.activeFolderId
+                });
+                renderFolders();
+                renderMain();
+                showToast('✅ Subfolder created');
+            }
+        });
+
+        viewerClose.addEventListener('click', closeViewer);
+
+        viewer.addEventListener('click', (e) => {
+            if (e.target === viewer) {
+                closeViewer();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (viewer.getAttribute('aria-hidden') === 'false') {
+                if (e.key === 'Escape') {
+                    closeViewer();
+                }
+            }
+        });
+
+        // Close folder menus when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.folder-menu')) {
+                document.querySelectorAll('.folder-menu').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+
+        // Initialize
+        renderFolders();
+        renderMain();
+    </script>
+</body>
+</html>
